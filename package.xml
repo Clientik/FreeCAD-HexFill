@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>HexFill</name>
-  <description>Creates a grid of honeycombs for any sketch template.</description>
+  <description>Fill any sketch with a honeycomb pattern in one click. Pick a
+    sketch, choose the cell size, and HexFill builds the whole hexagonal grid
+    for you - ready to Pocket into a lightweight perforated panel or Pad into a
+    honeycomb solid. Manual or automatic sizing, edge trimming and a live 3D
+    preview.</description>
   <version>1.0.0</version>
   <date>2026-06-11</date>
 
@@ -17,7 +21,7 @@
   <content>
     <workbench>
       <name>HexFill</name>
-      <description>Creates a grid of honeycombs for any sketch template.</description>
+      <description>Fill any sketch with a honeycomb pattern in one click.</description>
       <icon>Resources/icons/HexFill.svg</icon>
       <classname>HexFillManipulator</classname>
       <subdirectory>./</subdirectory>

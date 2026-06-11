@@ -1,32 +1,50 @@
+<img src="Resources/icons/HexFill.svg" width="84" align="left" alt="HexFill icon">
+
 # HexFill
 
-Creates a grid of honeycombs for any sketch template — a ready-made honeycomb
-mesh generated in one click, so you don't have to draw it by hand. The result
-is a plain sketch you can Pad or Pocket.
+**Fill any sketch with a honeycomb pattern in one click.**
 
-<img src="Resources/icons/HexFill.svg" width="96" alt="HexFill icon">
+Drawing a honeycomb by hand in FreeCAD is slow and tedious. HexFill does it for
+you: pick a sketch, choose how big the cells should be, and it builds the whole
+hexagonal grid for you. The result is an ordinary sketch — so you can **Pocket**
+it to make a perforated panel, or **Pad** it into a honeycomb solid.
+
+<br clear="left">
+
+![HexFill tutorial](docs/tutorial.gif)
+
+## What you can do with it
+
+- Lightweight panels and grilles (pocket the honeycomb through a plate)
+- Honeycomb infill for 3D-printed or machined parts
+- Decorative hex patterns on any flat face
+
+## How to use it
+
+1. Make a sketch with a closed outline (rectangle, circle, any shape) and Pad it.
+2. Select that sketch in the model tree.
+3. Click **HexFill** (in the Sketcher toolbar or the *Tools* menu).
+4. Adjust the cell size in the side panel — you see a live preview as you type.
+5. Press **OK**. A new `HexGrid` sketch appears.
+6. Select `HexGrid` and use **Pocket** (cut the holes) or **Pad** (raise the walls).
 
 ![HexFill in FreeCAD](docs/screenshot.png)
 
-## Features
+## Options
 
-- Works on any closed sketch profile (rectangle, circle, arbitrary contour).
-- **Manual** mode (set cell diameter and wall gap) or **Auto** mode that sizes
-  a stiff, light honeycomb from the profile.
-- **Outfill** option to trim the border cells to the outline and fill to the edge.
-- 3×3 **anchor** selector to control where the lattice starts.
-- Live 3D preview while you tune the parameters.
-- Output is a plain Sketch, ready for PartDesign **Pad** / **Pocket**.
+| Option | What it does |
+|--------|--------------|
+| **Mode: Manual** | You set the cell diameter and the wall thickness (gap). |
+| **Mode: Auto** | Picks a strong, light honeycomb automatically from the sketch size. |
+| **Outfill** | Trims the edge cells to the outline so the pattern fills right to the border. |
+| **Anchor (3×3)** | Chooses where the grid starts — centered, from a corner, etc. |
+| **Live preview** | Shows the grid in the 3D view while you tune the numbers. |
 
 ## Installation
 
-### Addon Manager (recommended once published)
+**Addon Manager** (recommended): `Tools → Addon manager`, find **HexFill**, click *Install*, restart FreeCAD.
 
-`Tools → Addon manager → HexFill → Install`.
-
-### Manual
-
-Copy the `HexFill` folder into your FreeCAD `Mod` directory and restart:
+**Manual:** copy this folder into your FreeCAD `Mod` directory and restart:
 
 | OS | Path |
 |----|------|
@@ -34,17 +52,9 @@ Copy the `HexFill` folder into your FreeCAD `Mod` directory and restart:
 | Linux | `~/.local/share/FreeCAD/Mod/` |
 | macOS | `~/Library/Application Support/FreeCAD/Mod/` |
 
-## Usage
-
-1. Create and (optionally) Pad a sketch.
-2. Select the sketch in the tree.
-3. Run **HexFill** (Sketcher toolbar, or `Tools` menu).
-4. Set the parameters in the task panel and press OK.
-5. Select the generated `HexGrid` sketch and apply **Pocket** / **Pad**.
-
 ## Requirements
 
-FreeCAD 0.21 or newer (Python 3, PySide2 or PySide6).
+FreeCAD 0.21 or newer.
 
 ## License
 

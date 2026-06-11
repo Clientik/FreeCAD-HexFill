@@ -28,15 +28,9 @@
         Pad or Pocket.</description>
       <icon>Resources/icons/HexFill.svg</icon>
       <tag>honeycomb</tag>
-      <tag>hexagonal grid</tag>
-      <tag>hexagon</tag>
-      <tag>honeycomb mesh</tag>
-      <tag>lattice</tag>
-      <tag>infill</tag>
+      <tag>hexagonal</tag>
       <tag>perforation</tag>
-      <tag>pattern</tag>
-      <tag>lightweight panel</tag>
-      <tag>sketch</tag>
+      <tag>infill</tag>
     </workbench>
   </content>
 

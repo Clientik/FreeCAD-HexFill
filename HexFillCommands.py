@@ -539,29 +539,46 @@ class CmdHexFillCreate:
             ),
         }
 
+    @staticmethod
+    def _usable(obj):
+        """True if obj can provide a closed boundary (sketch, face or wire)."""
+        if obj is None:
+            return False
+        if obj.isDerivedFrom("Sketcher::SketchObject"):
+            return True
+        shape = getattr(obj, "Shape", None)
+        if shape is None:
+            return False
+        try:
+            return bool(shape.Faces) or any(w.isClosed() for w in shape.Wires)
+        except Exception:
+            return False
+
     def IsActive(self):
         if App.ActiveDocument is None:
             return False
-        return len(Gui.Selection.getSelection()) > 0
+        sel = Gui.Selection.getSelection()
+        return bool(sel) and self._usable(sel[0])
 
     def Activated(self):
         from HexFillCore import get_boundary_face, get_source_placement
 
         sel = Gui.Selection.getSelection()
-        if not sel:
-            App.Console.PrintError("HexFill: nothing selected. Select a sketch.\n")
+        source = sel[0] if sel else None
+        if not self._usable(source):
+            QMessageBox.critical(
+                Gui.getMainWindow() if hasattr(Gui, "getMainWindow") else None,
+                "HexFill",
+                "Select a sketch (or a profile with a closed contour) first.")
             return
-
-        source = sel[0]
-        if not source.isDerivedFrom("Sketcher::SketchObject"):
-            App.Console.PrintWarning(
-                "HexFill: selected object is not a Sketch — trying to use its "
-                "shape as a boundary anyway.\n"
-            )
 
         face = get_boundary_face(source)
         if face is None:
-            return  # error already printed
+            QMessageBox.critical(
+                Gui.getMainWindow() if hasattr(Gui, "getMainWindow") else None,
+                "HexFill",
+                "The selected object has no closed contour to fill.")
+            return
 
         placement = get_source_placement(source, face)
         panel = HexFillTaskPanel(source, face, placement)

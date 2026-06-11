@@ -109,7 +109,8 @@ class _HelpLabel(QLabel):
         self.setWhatsThis(text)
         self.setCursor(QtCore.Qt.WhatsThisCursor)
 
-    def mousePressEvent(self, event):
+    def mouseReleaseEvent(self, event):
+        # Fire on a full click (release), not while the button is held down.
         # Passing self.rect() makes Qt hide the tip once the cursor leaves it.
         QtGui.QToolTip.showText(QtGui.QCursor.pos(), self._help, self, self.rect())
 

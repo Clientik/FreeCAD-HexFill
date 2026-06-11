@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Background -->
-  <rect width="64" height="64" rx="6" fill="#2a5080"/>
-
-  <!-- Honeycomb: 7 flat-top hexagons, R≈10 -->
-  <!-- Center hex -->
-  <polygon points="32,20 40.66,25 40.66,35 32,40 23.34,35 23.34,25"
-           fill="none" stroke="#f0c040" stroke-width="2.5" stroke-linejoin="round"/>
-  <!-- Top-left -->
-  <polygon points="18,11 26.66,16 26.66,26 18,31 9.34,26 9.34,16"
-           fill="none" stroke="#f0c040" stroke-width="2" stroke-linejoin="round"/>
-  <!-- Top-right -->
-  <polygon points="46,11 54.66,16 54.66,26 46,31 37.34,26 37.34,16"
-           fill="none" stroke="#f0c040" stroke-width="2" stroke-linejoin="round"/>
-  <!-- Left -->
-  <polygon points="9,31 17.66,36 17.66,46 9,51 0.34,46 0.34,36"
-           fill="none" stroke="#f0c040" stroke-width="2" stroke-linejoin="round"/>
-  <!-- Right -->
-  <polygon points="55,31 63.66,36 63.66,46 55,51 46.34,46 46.34,36"
-           fill="none" stroke="#f0c040" stroke-width="2" stroke-linejoin="round"/>
-  <!-- Bottom-left -->
-  <polygon points="18,43 26.66,48 26.66,58 18,63 9.34,58 9.34,48"
-           fill="none" stroke="#f0c040" stroke-width="2" stroke-linejoin="round"/>
-  <!-- Bottom-right -->
-  <polygon points="46,43 54.66,48 54.66,58 46,63 37.34,58 37.34,48"
-           fill="none" stroke="#f0c040" stroke-width="2" stroke-linejoin="round"/>
+  <rect width="64" height="64" rx="10" fill="#243447"/>
+  <g fill="#f0a830" stroke="#243447" stroke-width="2" stroke-linejoin="round">
+    <!-- center -->
+    <polygon points="32,22 39.5,26.3 39.5,34.9 32,39.2 24.5,34.9 24.5,26.3"/>
+    <!-- top-left / top-right -->
+    <polygon points="20.5,15.4 28,19.7 28,28.3 20.5,32.6 13,28.3 13,19.7"/>
+    <polygon points="43.5,15.4 51,19.7 51,28.3 43.5,32.6 36,28.3 36,19.7"/>
+    <!-- bottom-left / bottom-right -->
+    <polygon points="20.5,32.6 28,36.9 28,45.5 20.5,49.8 13,45.5 13,36.9"/>
+    <polygon points="43.5,32.6 51,36.9 51,45.5 43.5,49.8 36,45.5 36,36.9"/>
+    <!-- bottom center -->
+    <polygon points="32,42.5 39.5,46.8 39.5,55.4 32,59.7 24.5,55.4 24.5,46.8"/>
+  </g>
 </svg>

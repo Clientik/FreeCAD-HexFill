@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
+  <name>HexFill</name>
+  <description>Fill a sketch profile with a parametric hexagonal honeycomb and
+    output a sketch ready for Pad / Pocket.</description>
+  <version>1.0.0</version>
+  <date>2026-06-11</date>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license file="LICENSE">MIT</license>
+
+  <url type="repository" branch="main">https://github.com/yourname/HexFill</url>
+  <url type="readme">https://github.com/yourname/HexFill/blob/main/README.md</url>
+  <url type="bugtracker">https://github.com/yourname/HexFill/issues</url>
+
+  <icon>Resources/icons/HexFill.svg</icon>
+
+  <content>
+    <workbench>
+      <name>HexFill</name>
+      <description>Hexagonal honeycomb fill for sketches.</description>
+      <icon>Resources/icons/HexFill.svg</icon>
+      <classname>HexFillManipulator</classname>
+      <subdirectory>./</subdirectory>
+    </workbench>
+  </content>
+
+  <freecadmin>0.21</freecadmin>
+</package>

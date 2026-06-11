@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.pyo
+*.FCStd1
+.DS_Store

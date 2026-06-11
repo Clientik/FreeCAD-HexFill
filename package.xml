@@ -1,15 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>HexFill</name>
   <description>Fill any sketch with a honeycomb pattern in one click. Pick a
     sketch, choose the cell size, and HexFill builds the whole hexagonal grid
     for you - ready to Pocket into a lightweight perforated panel or Pad into a
     honeycomb solid. Manual or automatic sizing, edge trimming and a live 3D
-    preview.</description>
+    preview. Several closed regions in one sketch are filled at once.</description>
   <version>1.0.0</version>
   <date>2026-06-11</date>
 
   <maintainer email="clientiks@gmail.com">Clientik</maintainer>
+  <author email="clientiks@gmail.com">Clientik</author>
   <license file="LICENSE">MIT</license>
 
   <url type="repository" branch="main">https://github.com/Clientik/FreeCAD-HexFill</url>
@@ -20,11 +21,22 @@
 
   <content>
     <workbench>
-      <name>HexFill</name>
-      <description>Fill any sketch with a honeycomb pattern in one click.</description>
-      <icon>Resources/icons/HexFill.svg</icon>
       <classname>HexFillManipulator</classname>
       <subdirectory>./</subdirectory>
+      <name>HexFill</name>
+      <description>Fill a sketch with a honeycomb (hexagonal) grid, ready for
+        Pad or Pocket.</description>
+      <icon>Resources/icons/HexFill.svg</icon>
+      <tag>honeycomb</tag>
+      <tag>hexagonal grid</tag>
+      <tag>hexagon</tag>
+      <tag>honeycomb mesh</tag>
+      <tag>lattice</tag>
+      <tag>infill</tag>
+      <tag>perforation</tag>
+      <tag>pattern</tag>
+      <tag>lightweight panel</tag>
+      <tag>sketch</tag>
     </workbench>
   </content>
 

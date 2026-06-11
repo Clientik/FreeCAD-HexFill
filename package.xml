@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>HexFill</name>
-  <description>Fill a sketch profile with a parametric hexagonal honeycomb and
-    output a sketch ready for Pad / Pocket.</description>
+  <description>Creates a grid of honeycombs for any sketch template.</description>
   <version>1.0.0</version>
   <date>2026-06-11</date>
 
-  <maintainer email="you@example.com">Your Name</maintainer>
+  <maintainer email="clientiks@gmail.com">Clientik</maintainer>
   <license file="LICENSE">MIT</license>
 
-  <url type="repository" branch="main">https://github.com/yourname/HexFill</url>
-  <url type="readme">https://github.com/yourname/HexFill/blob/main/README.md</url>
-  <url type="bugtracker">https://github.com/yourname/HexFill/issues</url>
+  <url type="repository" branch="main">https://github.com/Clientik/FreeCAD-HexFill</url>
+  <url type="readme">https://github.com/Clientik/FreeCAD-HexFill/blob/main/README.md</url>
+  <url type="bugtracker">https://github.com/Clientik/FreeCAD-HexFill/issues</url>
 
   <icon>Resources/icons/HexFill.svg</icon>
 
   <content>
     <workbench>
       <name>HexFill</name>
-      <description>Hexagonal honeycomb fill for sketches.</description>
+      <description>Creates a grid of honeycombs for any sketch template.</description>
       <icon>Resources/icons/HexFill.svg</icon>
       <classname>HexFillManipulator</classname>
       <subdirectory>./</subdirectory>

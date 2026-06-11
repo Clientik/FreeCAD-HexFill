@@ -1,7 +1,8 @@
 # HexFill
 
-A small FreeCAD add-on that fills a sketch profile with a hexagonal honeycomb
-pattern and produces a new sketch you can Pad or Pocket.
+Creates a grid of honeycombs for any sketch template — a ready-made honeycomb
+mesh generated in one click, so you don't have to draw it by hand. The result
+is a plain sketch you can Pad or Pocket.
 
 <img src="Resources/icons/HexFill.svg" width="96" alt="HexFill icon">
 

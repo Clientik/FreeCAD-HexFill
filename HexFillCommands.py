@@ -534,19 +534,14 @@ class CmdHexFillCreate:
                 os.path.dirname(__file__), "Resources", "icons", "HexFill.svg"
             ),
             "MenuText": "Create HexFill grid",
-            "ToolTip": (
-                "Fill a selected sketch with a hexagonal honeycomb pattern, "
-                "producing a new sketch ready for Pad / Pocket."
-            ),
+            "ToolTip": "Creates a grid of honeycombs for any sketch template.",
         }
 
     @staticmethod
     def _usable(obj):
-        """True if obj can provide a closed boundary (sketch, face or wire)."""
-        if obj is None:
+        """True only for a sketch that has at least one closed contour."""
+        if obj is None or not obj.isDerivedFrom("Sketcher::SketchObject"):
             return False
-        if obj.isDerivedFrom("Sketcher::SketchObject"):
-            return True
         shape = getattr(obj, "Shape", None)
         if shape is None:
             return False
@@ -570,7 +565,7 @@ class CmdHexFillCreate:
             QMessageBox.critical(
                 Gui.getMainWindow() if hasattr(Gui, "getMainWindow") else None,
                 "HexFill",
-                "Select a sketch (or a profile with a closed contour) first.")
+                "Please select a sketch with a closed contour first.")
             return
 
         face = get_boundary_face(source)

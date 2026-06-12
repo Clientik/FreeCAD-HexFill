@@ -51,6 +51,148 @@ def get_boundary_face(obj):
             return None
 
 
+def get_host_shape(source):
+    """The solid the sketch sits on, used to subtract existing cutouts.
+
+    Prefers the whole Body's final solid so every hole counts (including ones
+    cut after the attached feature), then falls back to the attached object's
+    solid. Returns None when nothing solid is found.
+    """
+    try:
+        body = source.getParentGeoFeatureGroup()
+        if body is not None:
+            shape = getattr(body, "Shape", None)
+            if shape is not None and shape.Solids:
+                return shape
+    except Exception:
+        pass
+    support = getattr(source, "AttachmentSupport", None) \
+        or getattr(source, "Support", None)
+    for obj, _subs in (support or ()):
+        shape = getattr(obj, "Shape", None)
+        if shape is not None and shape.Solids:
+            return shape
+    return None
+
+
+def host_material_region(host_shape, placement):
+    """Material cross-section of the host solid at the sketch plane.
+
+    Returns a face whose outer wire is the part's physical edge and whose holes
+    are every cutout/through-hole crossing the plane. None if unavailable.
+    """
+    if host_shape is None:
+        return None
+    try:
+        size = host_shape.BoundBox.DiagonalLength + 10.0
+        plane = Part.makePlane(2 * size, 2 * size, App.Vector(-size, -size, 0))
+        plane.Placement = App.Placement(placement)
+        region = plane.common(host_shape)
+        if region.Faces:
+            return region
+    except Exception:
+        pass
+    return None
+
+
+def subtract_host_holes(face, host_shape):
+    """Intersect *face* with *host_shape* so existing cutouts become holes.
+
+    Fallback for sketches not backed by host_material_region: any through-hole
+    crossing the sketch plane is removed.
+    """
+    if face is None or host_shape is None:
+        return face
+    try:
+        common = face.common(host_shape)
+        if common.Faces:
+            return common
+    except Exception:
+        pass
+    return face
+
+
+def _part_outline(host_region):
+    """Solid face of the whole part outline (cutouts filled in)."""
+    outlines = []
+    for f in host_region.Faces:
+        try:
+            outlines.append(Part.Face(f.OuterWire))
+        except Exception:
+            pass
+    if not outlines:
+        return None
+    panel = outlines[0]
+    if len(outlines) > 1:
+        panel = panel.fuse(outlines[1:])
+    return panel
+
+
+def _offset_out(faces, margin):
+    """Grow each face outward by *margin*; robust to boolean-derived geometry."""
+    grown = []
+    for f in faces:
+        try:
+            grown.extend(f.makeOffset2D(abs(margin)).Faces)
+        except Exception:
+            try:
+                grown.extend(f.removeSplitter().makeOffset2D(abs(margin)).Faces)
+            except Exception:
+                pass
+    return grown
+
+
+def apply_clearance(fill, host_region, margin, mode="contour"):
+    """Keep the honeycomb *margin* away from the chosen boundaries.
+
+    Cutouts always get a clearance ring. *mode* adds, in addition:
+      "contour" - the dividing contour (fill stops short of it, reaches the edge)
+      "edge"    - the part's physical edge (fill stops short of it, reaches the contour)
+      "both"    - both the contour and the edge
+
+    The relevant keep-out areas are grown outward by *margin* and cut from
+    *fill*. Only outward offsets of solid faces are used, so it is robust on
+    boolean geometry (circles included) - no per-hole special cases.
+    """
+    if fill is None or host_region is None or margin <= 0:
+        return fill
+    try:
+        panel = _part_outline(host_region)
+        if panel is None:
+            return fill
+        # Grow-based clearance: cutouts (always) and the opposite side of the
+        # contour, cut from the fill.
+        keepout = []
+        try:
+            keepout.extend(panel.cut(host_region).Faces)   # cutouts
+        except Exception:
+            pass
+        if mode in ("contour", "both"):
+            try:
+                keepout.extend(host_region.cut(fill).Faces)  # other side
+            except Exception:
+                pass
+        grown = _offset_out(keepout, margin)
+        if grown:
+            cut = fill.cut(Part.makeCompound(grown))
+            if cut.Faces:
+                fill = cut
+        # Edge clearance: pull the fill in from the part's physical edge by
+        # shrinking the part outline and intersecting.
+        if mode in ("edge", "both"):
+            try:
+                shrunk = panel.makeOffset2D(-abs(margin))
+                inset = fill.common(shrunk)
+                if inset.Faces:
+                    fill = inset
+            except Exception:
+                pass
+        return fill
+    except Exception as exc:
+        App.Console.PrintWarning("HexFill: margin could not be applied (%s)\n" % exc)
+    return fill
+
+
 def _planar_placement(face):
     """Placement mapping local XY onto the plane of a (planar) face."""
     if not getattr(face, "Surface", None) and face.Faces:
@@ -116,15 +258,40 @@ def _anchor_point(bb, anchor):
     return ax, ay
 
 
+# Upper bound on grid positions, so a tiny diameter on a big sketch can never
+# lock up FreeCAD. estimate_grid_positions() lets callers warn before running.
+MAX_CELLS = 20000
+
+
+def _grid_steps(diameter, gap):
+    r = max(diameter, 1e-6) / 2.0
+    col_step = 1.5 * r + gap * (math.sqrt(3) / 2)
+    row_step = math.sqrt(3) * r + gap
+    return r, max(col_step, 1e-6), max(row_step, 1e-6)
+
+
+def estimate_grid_positions(face, placement, diameter, gap):
+    """Rough number of lattice positions for the given settings (0 if invalid)."""
+    if diameter <= 0:
+        return 0
+    try:
+        bb = _flatten(face, placement).BoundBox
+        _, col_step, row_step = _grid_steps(diameter, gap)
+        nk = (bb.XLength + 2 * col_step) / col_step + 1
+        nm = (bb.YLength + 2 * row_step) / row_step + 1
+        return int(nk * nm)
+    except Exception:
+        return 0
+
+
 def _grid(flat, diameter, gap, anchor):
-    """Yield (cx, cy) cell centres covering the boundary's bounding box.
+    """Yield (cx, cy, r) cell centres covering the boundary's bounding box.
 
     A cell is pinned at the anchor point and the lattice (flat-top, offset
     columns) grows out from it, with a one-step margin for overhanging cells.
+    Stops once MAX_CELLS positions are produced, as a safety valve.
     """
-    r = diameter / 2.0
-    col_step = 1.5 * r + gap * (math.sqrt(3) / 2)
-    row_step = math.sqrt(3) * r + gap
+    r, col_step, row_step = _grid_steps(diameter, gap)
     bb = flat.BoundBox
     ax, ay = _anchor_point(bb, anchor)
 
@@ -133,10 +300,14 @@ def _grid(flat, diameter, gap, anchor):
     m_min = int(math.floor((bb.YMin - row_step - ay) / row_step))
     m_max = int(math.ceil((bb.YMax + row_step - ay) / row_step))
 
+    produced = 0
     for k in range(k_min, k_max + 1):
         cx = ax + k * col_step
         y_off = row_step / 2.0 if k % 2 else 0.0
         for m in range(m_min, m_max + 1):
+            produced += 1
+            if produced > MAX_CELLS:
+                return
             yield cx, ay + m * row_step + y_off, r
 
 
@@ -177,9 +348,12 @@ def generate_hex_cells_local(face, placement, diameter, gap,
     outfill False keeps only fully-enclosed cells; True keeps every cell whose
     centre lies inside the boundary.
     """
-    if diameter <= 0:
+    if diameter <= 0 or face is None:
         return []
-    flat = _flatten(face, placement)
+    try:
+        flat = _flatten(face, placement)
+    except Exception:
+        return []
     inside_any, fully_in_one = _make_inside_tests(flat)
 
     cells = []
@@ -198,9 +372,12 @@ def generate_hex_wires_local(face, placement, diameter, gap,
     In outfill mode boundary-crossing cells are clipped to the profile (their
     wires follow the outline); interior cells stay whole hexagons.
     """
-    if diameter <= 0:
+    if diameter <= 0 or face is None:
         return []
-    flat = _flatten(face, placement)
+    try:
+        flat = _flatten(face, placement)
+    except Exception:
+        return []
     inside_any, fully_in_one = _make_inside_tests(flat)
 
     def hex_wire(verts):

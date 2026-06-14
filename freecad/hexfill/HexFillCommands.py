@@ -10,7 +10,7 @@ import Part
 def _icon_path():
     """Absolute path to the addon icon (Resources/ lives at the addon root)."""
     root = os.path.join(os.path.dirname(__file__), "..", "..")
-    return os.path.normpath(os.path.join(root, "Resources", "icons", "HexFill.svg"))
+    return os.path.normpath(os.path.join(root, "Resources", "Icons", "HexFill.svg"))
 
 try:
     from PySide import QtGui, QtCore

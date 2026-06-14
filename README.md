@@ -11,7 +11,7 @@ it to make a perforated panel, or **Pad** it into a honeycomb solid.
 
 <br clear="left">
 
-![HexFill tutorial](docs/tutorial.gif)
+![HexFill tutorial](Resources/Media/tutorial.gif)
 
 ## What you can do with it
 
@@ -28,14 +28,14 @@ it to make a perforated panel, or **Pad** it into a honeycomb solid.
 5. Press **OK**. A new `HexGrid` sketch appears.
 6. Select `HexGrid` and use **Pocket** (cut the holes) or **Pad** (raise the walls).
 
-![HexFill in FreeCAD](docs/screenshot.png)
+![HexFill in FreeCAD](Resources/Media/screenshot.png)
 
 ## What's new in 1.2
 
 Version 1.2 makes HexFill aware of the part the sketch sits on, so the
 honeycomb fits real geometry instead of just the sketch outline.
 
-![Experimental margin](<docs/screenshot(experimental).png>)
+![Experimental margin](<Resources/Media/screenshot(experimental).png>)
 
 - **Fill: Outer / Inner** — the sketch contour now splits the part. *Inner*
   fills inside the contour, *Outer* fills the material outside it (up to the

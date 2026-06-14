@@ -17,7 +17,7 @@
   <url type="readme">https://raw.githubusercontent.com/Clientik/FreeCAD-HexFill/main/README.md</url>
   <url type="bugtracker">https://github.com/Clientik/FreeCAD-HexFill/issues</url>
 
-  <icon>Resources/icons/HexFill.svg</icon>
+  <icon>Resources/Icons/HexFill.svg</icon>
 
   <content>
     <other>

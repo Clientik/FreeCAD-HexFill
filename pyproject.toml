@@ -1,0 +1,16 @@
+[project]
+name = "freecad-hexfill"
+version = "1.2.0"
+description = "Fill any sketch with a parametric honeycomb pattern in FreeCAD."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [{ name = "Clientik", email = "clientiks@gmail.com" }]
+keywords = ["FreeCAD", "honeycomb", "hexagonal", "perforation", "infill"]
+
+[project.urls]
+Homepage = "https://github.com/Clientik/FreeCAD-HexFill"
+Issues = "https://github.com/Clientik/FreeCAD-HexFill/issues"
+
+[tool.setuptools.packages.find]
+include = ["freecad*"]

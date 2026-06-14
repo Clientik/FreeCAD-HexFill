@@ -45,7 +45,7 @@ class ViewProviderHexFill:
     def getIcon(self):
         root = os.path.join(os.path.dirname(__file__), "..", "..")
         return os.path.normpath(
-            os.path.join(root, "Resources", "icons", "HexFill.svg"))
+            os.path.join(root, "Resources", "Icons", "HexFill.svg"))
 
     def attach(self, vobj):
         pass

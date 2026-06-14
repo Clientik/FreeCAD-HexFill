@@ -1,6 +1,6 @@
-<img src="Resources/Icons/HexFill.svg" width="84" align="left" alt="HexFill icon">
-
 # HexFill
+
+<img src="Resources/Icons/HexFill.svg" width="96" alt="HexFill icon">
 
 **Fill any sketch with a honeycomb pattern in one click.**
 
@@ -8,8 +8,6 @@ Drawing a honeycomb by hand in FreeCAD is slow and tedious. HexFill does it for
 you: pick a sketch, choose how big the cells should be, and it builds the whole
 hexagonal grid for you. The result is an ordinary sketch — so you can **Pocket**
 it to make a perforated panel, or **Pad** it into a honeycomb solid.
-
-<br clear="left">
 
 ![HexFill tutorial](Resources/Media/tutorial.gif)
 

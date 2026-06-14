@@ -1,4 +1,4 @@
-<img src="Resources/icons/HexFill.svg" width="84" align="left" alt="HexFill icon">
+<img src="Resources/Icons/HexFill.svg" width="84" align="left" alt="HexFill icon">
 
 # HexFill
 
@@ -60,8 +60,10 @@ Plus a more robust live preview and faster, freeze-free parameter editing.
 |--------|--------------|
 | **Mode: Manual** | You set the cell diameter and the wall thickness (gap). |
 | **Mode: Auto** | Picks a strong, light honeycomb automatically from the sketch size. |
+| **Fill: Outer / Inner** | Fill the part material outside the sketch contour, or inside it. Existing cutouts are always avoided. |
 | **Outfill** | Trims the edge cells to the outline so the pattern fills right to the border. |
 | **Anchor (3×3)** | Chooses where the grid starts — centered, from a corner, etc. |
+| **Margin** *(experimental)* | Keeps a clean frame around cutouts / the contour / the part edge (see *What's new in 1.2*). |
 | **Live preview** | Shows the grid in the 3D view while you tune the numbers. |
 
 ## Installation
@@ -78,7 +80,7 @@ Plus a more robust live preview and faster, freeze-free parameter editing.
 
 ## Requirements
 
-FreeCAD 0.21 or newer.
+FreeCAD 1.0 or newer.
 
 ## License
 

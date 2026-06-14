@@ -14,25 +14,20 @@
   <license file="LICENSE">MIT</license>
 
   <url type="repository" branch="main">https://github.com/Clientik/FreeCAD-HexFill</url>
-  <url type="readme">https://github.com/Clientik/FreeCAD-HexFill/blob/main/README.md</url>
+  <url type="readme">https://raw.githubusercontent.com/Clientik/FreeCAD-HexFill/main/README.md</url>
   <url type="bugtracker">https://github.com/Clientik/FreeCAD-HexFill/issues</url>
 
   <icon>Resources/icons/HexFill.svg</icon>
 
   <content>
-    <workbench>
-      <classname>HexFillManipulator</classname>
+    <other>
       <subdirectory>./</subdirectory>
-      <name>HexFill</name>
-      <description>Fill a sketch with a honeycomb (hexagonal) grid, ready for
-        Pad or Pocket.</description>
-      <icon>Resources/icons/HexFill.svg</icon>
       <tag>honeycomb</tag>
       <tag>hexagonal</tag>
       <tag>perforation</tag>
       <tag>infill</tag>
-    </workbench>
+    </other>
   </content>
 
-  <freecadmin>0.21</freecadmin>
+  <freecadmin>1.0</freecadmin>
 </package>

@@ -43,8 +43,9 @@ class ViewProviderHexFill:
         vobj.Proxy = self
 
     def getIcon(self):
-        return os.path.join(os.path.dirname(__file__),
-                            "Resources", "icons", "HexFill.svg")
+        root = os.path.join(os.path.dirname(__file__), "..", "..")
+        return os.path.normpath(
+            os.path.join(root, "Resources", "icons", "HexFill.svg"))
 
     def attach(self, vobj):
         pass

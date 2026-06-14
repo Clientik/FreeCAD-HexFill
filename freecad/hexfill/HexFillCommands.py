@@ -6,6 +6,12 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import Part
 
+
+def _icon_path():
+    """Absolute path to the addon icon (Resources/ lives at the addon root)."""
+    root = os.path.join(os.path.dirname(__file__), "..", "..")
+    return os.path.normpath(os.path.join(root, "Resources", "icons", "HexFill.svg"))
+
 try:
     from PySide import QtGui, QtCore
     from PySide.QtGui import (
@@ -209,7 +215,7 @@ class HexFillTaskPanel:
         # Material cross-section of the part at the sketch plane: outer wire is
         # the physical edge, inner wires are the cutouts. Computed once.
         try:
-            from HexFillCore import host_material_region
+            from freecad.hexfill.HexFillCore import host_material_region
             self._host_region = host_material_region(host_face, placement)
         except Exception:
             self._host_region = None
@@ -444,7 +450,7 @@ class HexFillTaskPanel:
         sig = (self.inverse, round(self.margin, 4), self.margin_mode)
         if sig == self._active_sig:
             return
-        from HexFillCore import subtract_host_holes, apply_clearance
+        from freecad.hexfill.HexFillCore import subtract_host_holes, apply_clearance
 
         contour = self._face
         region = self._host_region
@@ -483,13 +489,13 @@ class HexFillTaskPanel:
 
     def _effective_params(self):
         if self.is_auto:
-            from HexFillCore import auto_parameters
+            from freecad.hexfill.HexFillCore import auto_parameters
             return auto_parameters(self._active_face, self._placement)
         return self.spin_diameter.value(), self.spin_gap.value()
 
     def _resolve_diameter(self, diameter, gap):
         """Apply manual auto-fit shrinking; return the diameter to use."""
-        from HexFillCore import generate_hex_cells_local
+        from freecad.hexfill.HexFillCore import generate_hex_cells_local
         if self.is_auto or not self.chk_autofit.isChecked():
             return diameter
         if generate_hex_cells_local(self._active_face, self._placement,
@@ -506,7 +512,7 @@ class HexFillTaskPanel:
         return diameter
 
     def _refresh(self, *args):
-        from HexFillCore import generate_hex_cells_local, estimate_grid_positions, MAX_CELLS
+        from freecad.hexfill.HexFillCore import generate_hex_cells_local, estimate_grid_positions, MAX_CELLS
 
         try:
             self._sync_active_face()
@@ -619,7 +625,7 @@ class HexFillTaskPanel:
         # Orange honeycomb cells.
         if n > 0:
             try:
-                from HexFillCore import generate_hex_wires_local
+                from freecad.hexfill.HexFillCore import generate_hex_wires_local
                 wires = generate_hex_wires_local(
                     self._active_face, self._placement, diameter, gap,
                     self.outfill, self.anchor)
@@ -660,7 +666,7 @@ class HexFillTaskPanel:
         return True
 
     def accept(self):
-        from HexFillCore import generate_hex_wires_local
+        from freecad.hexfill.HexFillCore import generate_hex_wires_local
 
         doc = App.ActiveDocument
         if doc is None or not getattr(self._source, "Name", None) \
@@ -779,9 +785,7 @@ class CmdHexFillCreate:
 
     def GetResources(self):
         return {
-            "Pixmap": os.path.join(
-                os.path.dirname(__file__), "Resources", "icons", "HexFill.svg"
-            ),
+            "Pixmap": _icon_path(),
             "MenuText": "Create HexFill grid",
             "ToolTip": "Creates a grid of honeycombs for any sketch template.",
         }
@@ -806,7 +810,7 @@ class CmdHexFillCreate:
         return bool(sel) and self._usable(sel[0])
 
     def Activated(self):
-        from HexFillCore import get_boundary_face, get_source_placement, get_host_shape
+        from freecad.hexfill.HexFillCore import get_boundary_face, get_source_placement, get_host_shape
 
         _remove_stale_previews()  # clear any preview orphaned by a previous run
         sel = Gui.Selection.getSelection()

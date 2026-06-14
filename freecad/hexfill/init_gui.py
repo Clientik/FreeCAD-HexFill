@@ -2,32 +2,28 @@
 
 import FreeCADGui as Gui
 
-import HexFillCommands  # noqa: F401  (registers HexFill_Create)
+from freecad.hexfill import HexFillCommands  # noqa: F401  (registers HexFill_Create)
 
 
 class HexFillManipulator:
-    """Adds HexFill to the Sketcher workbench toolbar and menu.
+    """Adds the HexFill command to the Sketcher workbench toolbar and menu.
 
-    Manipulators run per workbench, so the entries are only emitted while
-    Sketcher is being set up (or when the workbench can't be identified, so the
-    command is never lost). Names are resolved inside the methods because
-    InitGui.py runs with separate globals/locals.
+    Manipulators run per workbench; the entries are emitted only when the
+    workbench being set up is confirmed to be Sketcher.
     """
 
     TARGET_WB = "SketcherWorkbench"
 
     def _wanted(self):
         import FreeCADGui as Gui
-        name = ""
         try:
             active = Gui.activeWorkbench()
-            for wb_name, wb in Gui.listWorkbenches().items():
+            for name, wb in Gui.listWorkbenches().items():
                 if wb is active:
-                    name = wb_name
-                    break
+                    return name == self.TARGET_WB
         except Exception:
             pass
-        return name in (self.TARGET_WB, "")
+        return False
 
     def modifyToolBars(self):
         if not self._wanted():
@@ -42,10 +38,4 @@ class HexFillManipulator:
 
 if getattr(Gui, "HexFillManipulator", None) is None:
     Gui.HexFillManipulator = HexFillManipulator()
-Gui.addWorkbenchManipulator(Gui.HexFillManipulator)
-
-# Re-apply to the workbench that was already active at startup.
-try:
-    Gui.activeWorkbench().reloadActive()
-except Exception:
-    pass
+    Gui.addWorkbenchManipulator(Gui.HexFillManipulator)

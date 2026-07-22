@@ -60,6 +60,7 @@ Plus a more robust live preview and faster, freeze-free parameter editing.
 | **Mode: Auto** | Picks a strong, light honeycomb automatically from the sketch size. |
 | **Fill: Outer / Inner** | Fill the part material outside the sketch contour, or inside it. Existing cutouts are always avoided. |
 | **Outfill** | Trims the edge cells to the outline so the pattern fills right to the border. |
+| **Orientation** | Choose flat-top cells or point-up cells. |
 | **Anchor (3×3)** | Chooses where the grid starts — centered, from a corner, etc. |
 | **Margin** *(experimental)* | Keeps a clean frame around cutouts / the contour / the part edge (see *What's new in 1.2*). |
 | **Live preview** | Shows the grid in the 3D view while you tune the numbers. |

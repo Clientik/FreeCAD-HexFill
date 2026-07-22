@@ -245,9 +245,10 @@ def auto_parameters(face, placement):
     return diameter, gap
 
 
-def _hex_vertices(cx, cy, r):
-    return [App.Vector(cx + r * math.cos(math.radians(60 * i)),
-                       cy + r * math.sin(math.radians(60 * i)), 0)
+def _hex_vertices(cx, cy, r, orientation="flat"):
+    start = 30 if orientation == "point" else 0
+    return [App.Vector(cx + r * math.cos(math.radians(start + 60 * i)),
+                       cy + r * math.sin(math.radians(start + 60 * i)), 0)
             for i in range(6)]
 
 
@@ -263,20 +264,24 @@ def _anchor_point(bb, anchor):
 MAX_CELLS = 20000
 
 
-def _grid_steps(diameter, gap):
+def _grid_steps(diameter, gap, orientation="flat"):
     r = max(diameter, 1e-6) / 2.0
-    col_step = 1.5 * r + gap * (math.sqrt(3) / 2)
-    row_step = math.sqrt(3) * r + gap
+    if orientation == "point":
+        col_step = math.sqrt(3) * r + gap
+        row_step = 1.5 * r + gap * (math.sqrt(3) / 2)
+    else:
+        col_step = 1.5 * r + gap * (math.sqrt(3) / 2)
+        row_step = math.sqrt(3) * r + gap
     return r, max(col_step, 1e-6), max(row_step, 1e-6)
 
 
-def estimate_grid_positions(face, placement, diameter, gap):
+def estimate_grid_positions(face, placement, diameter, gap, orientation="flat"):
     """Rough number of lattice positions for the given settings (0 if invalid)."""
     if diameter <= 0:
         return 0
     try:
         bb = _flatten(face, placement).BoundBox
-        _, col_step, row_step = _grid_steps(diameter, gap)
+        _, col_step, row_step = _grid_steps(diameter, gap, orientation)
         nk = (bb.XLength + 2 * col_step) / col_step + 1
         nm = (bb.YLength + 2 * row_step) / row_step + 1
         return int(nk * nm)
@@ -284,14 +289,15 @@ def estimate_grid_positions(face, placement, diameter, gap):
         return 0
 
 
-def _grid(flat, diameter, gap, anchor):
+def _grid(flat, diameter, gap, anchor, orientation="flat"):
     """Yield (cx, cy, r) cell centres covering the boundary's bounding box.
 
-    A cell is pinned at the anchor point and the lattice (flat-top, offset
-    columns) grows out from it, with a one-step margin for overhanging cells.
+    A cell is pinned at the anchor point and the lattice grows out from it,
+    with a one-step margin for overhanging cells. Flat-top cells use offset
+    columns; point-up cells use offset rows.
     Stops once MAX_CELLS positions are produced, as a safety valve.
     """
-    r, col_step, row_step = _grid_steps(diameter, gap)
+    r, col_step, row_step = _grid_steps(diameter, gap, orientation)
     bb = flat.BoundBox
     ax, ay = _anchor_point(bb, anchor)
 
@@ -301,14 +307,24 @@ def _grid(flat, diameter, gap, anchor):
     m_max = int(math.ceil((bb.YMax + row_step - ay) / row_step))
 
     produced = 0
-    for k in range(k_min, k_max + 1):
-        cx = ax + k * col_step
-        y_off = row_step / 2.0 if k % 2 else 0.0
+    if orientation == "point":
         for m in range(m_min, m_max + 1):
-            produced += 1
-            if produced > MAX_CELLS:
-                return
-            yield cx, ay + m * row_step + y_off, r
+            cy = ay + m * row_step
+            x_off = col_step / 2.0 if m % 2 else 0.0
+            for k in range(k_min, k_max + 1):
+                produced += 1
+                if produced > MAX_CELLS:
+                    return
+                yield ax + k * col_step + x_off, cy, r
+    else:
+        for k in range(k_min, k_max + 1):
+            cx = ax + k * col_step
+            y_off = row_step / 2.0 if k % 2 else 0.0
+            for m in range(m_min, m_max + 1):
+                produced += 1
+                if produced > MAX_CELLS:
+                    return
+                yield cx, ay + m * row_step + y_off, r
 
 
 def _make_inside_tests(flat):
@@ -342,7 +358,8 @@ def _make_inside_tests(flat):
 
 
 def generate_hex_cells_local(face, placement, diameter, gap,
-                             outfill=False, anchor=("center", "center")):
+                             outfill=False, anchor=("center", "center"),
+                             orientation="flat"):
     """Return kept cells as lists of 6 local vertices (used for a fast count).
 
     outfill False keeps only fully-enclosed cells; True keeps every cell whose
@@ -357,8 +374,8 @@ def generate_hex_cells_local(face, placement, diameter, gap,
     inside_any, fully_in_one = _make_inside_tests(flat)
 
     cells = []
-    for cx, cy, r in _grid(flat, diameter, gap, anchor):
-        verts = _hex_vertices(cx, cy, r)
+    for cx, cy, r in _grid(flat, diameter, gap, anchor, orientation):
+        verts = _hex_vertices(cx, cy, r, orientation)
         keep = inside_any(App.Vector(cx, cy, 0)) if outfill else fully_in_one(verts)
         if keep:
             cells.append(verts)
@@ -366,7 +383,8 @@ def generate_hex_cells_local(face, placement, diameter, gap,
 
 
 def generate_hex_wires_local(face, placement, diameter, gap,
-                             outfill=False, anchor=("center", "center")):
+                             outfill=False, anchor=("center", "center"),
+                             orientation="flat"):
     """Return local Part.Wire contours for the cells.
 
     In outfill mode boundary-crossing cells are clipped to the profile (their
@@ -385,8 +403,8 @@ def generate_hex_wires_local(face, placement, diameter, gap,
                           for i in range(6)])
 
     wires = []
-    for cx, cy, r in _grid(flat, diameter, gap, anchor):
-        verts = _hex_vertices(cx, cy, r)
+    for cx, cy, r in _grid(flat, diameter, gap, anchor, orientation):
+        verts = _hex_vertices(cx, cy, r, orientation)
 
         if fully_in_one(verts):
             wires.append(hex_wire(verts))

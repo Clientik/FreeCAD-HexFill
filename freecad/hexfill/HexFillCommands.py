@@ -315,6 +315,16 @@ class HexFillTaskPanel:
 
         # Existing cutouts on the attached face are always subtracted (no UI).
 
+        self.combo_orientation = QComboBox()
+        self.combo_orientation.addItems(["Flat top", "Point up"])
+        lform.addRow(
+            "Orientation:",
+            _row_with_help(
+                self.combo_orientation,
+                "Hexagon direction:\n"
+                "  Flat top - horizontal top/bottom edges.\n"
+                "  Point up - one vertex points upward."))
+
         self._anchor_h = ["left", "center", "right"]
         self._anchor_v = ["top", "center", "bottom"]
         anchor_grid = QGridLayout()
@@ -404,6 +414,7 @@ class HexFillTaskPanel:
         self.spin_gap.valueChanged.connect(self._refresh)
         self.combo_fill.currentIndexChanged.connect(self._refresh)
         self.chk_outfill.toggled.connect(self._refresh)
+        self.combo_orientation.currentIndexChanged.connect(self._refresh)
         self.chk_margin.toggled.connect(self._refresh)
         self.combo_margin_mode.currentIndexChanged.connect(self._refresh)
         self.spin_margin.valueChanged.connect(self._refresh)
@@ -426,6 +437,10 @@ class HexFillTaskPanel:
     @property
     def outfill(self):
         return self.chk_outfill.isChecked()
+
+    @property
+    def orientation(self):
+        return "point" if self.combo_orientation.currentIndex() == 1 else "flat"
 
     @property
     def inverse(self):
@@ -499,7 +514,8 @@ class HexFillTaskPanel:
         if self.is_auto or not self.chk_autofit.isChecked():
             return diameter
         if generate_hex_cells_local(self._active_face, self._placement,
-                                    diameter, gap, self.outfill, self.anchor):
+                                    diameter, gap, self.outfill, self.anchor,
+                                    self.orientation):
             return diameter
         d = diameter
         for _ in range(20):
@@ -507,7 +523,8 @@ class HexFillTaskPanel:
             if d < 0.05:
                 break
             if generate_hex_cells_local(self._active_face, self._placement,
-                                        d, gap, self.outfill, self.anchor):
+                                        d, gap, self.outfill, self.anchor,
+                                        self.orientation):
                 return d
         return diameter
 
@@ -529,7 +546,7 @@ class HexFillTaskPanel:
 
             # Guard against a diameter so small it would make a huge grid.
             if estimate_grid_positions(self._active_face, self._placement,
-                                       diameter, gap) > MAX_CELLS:
+                                       diameter, gap, self.orientation) > MAX_CELLS:
                 self._clear_preview()
                 self.lbl_status.setText(
                     "⚠ Cells are too small for this profile — increase Diameter.")
@@ -540,7 +557,7 @@ class HexFillTaskPanel:
             try:
                 n = len(generate_hex_cells_local(
                     self._active_face, self._placement, eff_d, gap,
-                    self.outfill, self.anchor))
+                    self.outfill, self.anchor, self.orientation))
             except Exception:
                 n = 0
 
@@ -628,7 +645,7 @@ class HexFillTaskPanel:
                 from freecad.hexfill.HexFillCore import generate_hex_wires_local
                 wires = generate_hex_wires_local(
                     self._active_face, self._placement, diameter, gap,
-                    self.outfill, self.anchor)
+                    self.outfill, self.anchor, self.orientation)
                 hexes = self._wires_to_polylines(wires, defl)
                 if hexes:
                     sep.addChild(self._line_node(hexes, (0.95, 0.6, 0.1), 2.0))
@@ -683,7 +700,7 @@ class HexFillTaskPanel:
         try:
             wires = generate_hex_wires_local(
                 self._active_face, self._placement, diameter, gap,
-                self.outfill, self.anchor)
+                self.outfill, self.anchor, self.orientation)
         except Exception as exc:
             App.Console.PrintError("HexFill: could not build the grid (%s)\n" % exc)
             wires = []

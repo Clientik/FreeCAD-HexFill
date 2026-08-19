@@ -3,3 +3,6 @@ __pycache__/
 *.pyo
 *.FCStd1
 .DS_Store
+
+# stray drop folder (media lives in Resources/Media)
+docs/

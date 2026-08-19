@@ -28,6 +28,12 @@ it to make a perforated panel, or **Pad** it into a honeycomb solid.
 
 ![HexFill in FreeCAD](Resources/Media/screenshot.png)
 
+## What's new in 1.2.5
+
+- **Orientation** — choose flat-top or point-up hexagons (thanks @juniorgarcia).
+- The generated `HexGrid` now stays attached to the source sketch, so it follows
+  the part when it is moved.
+
 ## What's new in 1.2
 
 Version 1.2 makes HexFill aware of the part the sketch sits on, so the

@@ -777,7 +777,18 @@ def _build_hex_sketch(source, wires, placement):
                 pass
 
     if not inherited or getattr(sketch, "MapMode", "Deactivated") == "Deactivated":
-        sketch.Placement = App.Placement(placement)
+        # Nothing to inherit: attach to the source sketch itself so the grid
+        # follows it when the part or sketch is moved later (issue #3), instead
+        # of freezing an absolute placement.
+        try:
+            if hasattr(sketch, "AttachmentSupport"):
+                sketch.AttachmentSupport = [(source, "")]
+            else:
+                sketch.Support = [(source, "")]
+            sketch.MapMode = "ObjectXY"
+            sketch.AttachmentOffset = App.Placement()
+        except Exception:
+            sketch.Placement = App.Placement(placement)
 
     for wire in wires:
         for edge in wire.Edges:

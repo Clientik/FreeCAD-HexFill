@@ -51,19 +51,50 @@ def get_boundary_face(obj):
             return None
 
 
+def _shape_frame(obj):
+    """Placement mapping *obj*'s Shape coordinates to the world.
+
+    obj.Shape carries obj.Placement, so the remaining transform is the chain of
+    parent containers: getGlobalPlacement() with the local placement undone.
+    """
+    try:
+        return obj.getGlobalPlacement().multiply(obj.Placement.inverse())
+    except Exception:
+        return App.Placement()
+
+
+def _in_source_frame(shape, host, source):
+    """Express *shape* (owned by *host*) in the frame of source.Shape.
+
+    A sketch inside a moved Body keeps its Shape in body-local coordinates
+    while the Body's own Shape is in world coordinates; mixing the two shifts
+    every host-material computation by the Body's placement. Re-basing the host
+    shape into the source's frame keeps all boolean work in one frame.
+    """
+    try:
+        rebase = _shape_frame(source).inverse().multiply(_shape_frame(host))
+        if rebase.Base.Length > 1e-9 or abs(rebase.Rotation.Angle) > 1e-12:
+            shape = shape.copy()
+            shape.Placement = rebase.multiply(shape.Placement)
+    except Exception:
+        pass
+    return shape
+
+
 def get_host_shape(source):
     """The solid the sketch sits on, used to subtract existing cutouts.
 
     Prefers the whole Body's final solid so every hole counts (including ones
     cut after the attached feature), then falls back to the attached object's
-    solid. Returns None when nothing solid is found.
+    solid. The result is expressed in the same coordinate frame as
+    source.Shape. Returns None when nothing solid is found.
     """
     try:
         body = source.getParentGeoFeatureGroup()
         if body is not None:
             shape = getattr(body, "Shape", None)
             if shape is not None and shape.Solids:
-                return shape
+                return _in_source_frame(shape, body, source)
     except Exception:
         pass
     support = getattr(source, "AttachmentSupport", None) \
@@ -71,7 +102,7 @@ def get_host_shape(source):
     for obj, _subs in (support or ()):
         shape = getattr(obj, "Shape", None)
         if shape is not None and shape.Solids:
-            return shape
+            return _in_source_frame(shape, obj, source)
     return None
 
 

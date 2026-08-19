@@ -17,6 +17,13 @@ it to make a perforated panel, or **Pad** it into a honeycomb solid.
 - Honeycomb infill for 3D-printed or machined parts
 - Decorative hex patterns on any flat face
 
+## Where to find it
+
+The **HexFill** button lives in the **Sketcher workbench**: switch to *Sketcher*
+and look for it in the toolbar, or in the **Sketch → Tools** menu. It is not
+shown in other workbenches. If you don't see it right after installing, restart
+FreeCAD once.
+
 ## How to use it
 
 1. Make a sketch with a closed outline (rectangle, circle, any shape) and Pad it.
@@ -33,6 +40,10 @@ it to make a perforated panel, or **Pad** it into a honeycomb solid.
 - **Orientation** — choose flat-top or point-up hexagons (thanks @juniorgarcia).
 - The generated `HexGrid` now stays attached to the source sketch, so it follows
   the part when it is moved.
+- Fixed: on a moved body, the honeycomb (and its live preview) no longer appears
+  shifted away from the part — Outer/Inner fill, hole avoidance and Margin now
+  land exactly on the model wherever it stands.
+- The preview is now reliably removed when the dialog is cancelled or closed.
 
 ## What's new in 1.2
 

@@ -173,33 +173,30 @@ def _row_with_help(control, help_text):
     return box
 
 
-_PREVIEW_NODE_NAME = "HexFillPreview"
+# Exactly one live preview node exists at a time. It is tracked here by direct
+# reference (node + the scene graph it was added to), so it is always removed
+# from the exact place it was added - no name scanning, no active-view guessing.
+_ACTIVE_PREVIEW = None  # tuple(node, scene_graph) or None
 
 
-def _remove_stale_previews():
-    """Remove any leftover preview nodes from the active view's scene graph.
+def _hide_preview():
+    """Remove the current preview node from the scene, if any."""
+    global _ACTIVE_PREVIEW
+    if _ACTIVE_PREVIEW is not None:
+        node, sg = _ACTIVE_PREVIEW
+        _ACTIVE_PREVIEW = None
+        try:
+            sg.removeChild(node)
+        except Exception:
+            pass
 
-    Matching by name means cleanup never depends on the panel closing cleanly,
-    so a preview can't be orphaned in the 3D view.
-    """
-    if coin is None:
-        return
-    try:
-        view = Gui.ActiveDocument.ActiveView if Gui.ActiveDocument else None
-        if view is None:
-            return
-        sg = view.getSceneGraph()
-        for i in reversed(range(sg.getNumChildren())):
-            child = sg.getChild(i)
-            try:
-                nm = child.getName()
-                nm = nm.getString() if hasattr(nm, "getString") else str(nm)
-                if nm == _PREVIEW_NODE_NAME:
-                    sg.removeChild(child)
-            except Exception:
-                pass
-    except Exception:
-        pass
+
+def _show_preview(node, sg):
+    """Replace any current preview with *node* (added to *sg*)."""
+    global _ACTIVE_PREVIEW
+    _hide_preview()
+    sg.addChild(node)
+    _ACTIVE_PREVIEW = (node, sg)
 
 
 class HexFillTaskPanel:
@@ -225,8 +222,6 @@ class HexFillTaskPanel:
             self._global_placement = source.getGlobalPlacement()
         except Exception:
             self._global_placement = placement
-        self._preview_node = None
-        self._preview_sg = None
 
         self.form = QWidget()
         self.form.setWindowTitle("HexFill")
@@ -627,7 +622,6 @@ class HexFillTaskPanel:
             return
         defl = max(diameter * 0.03, 0.05)
         sep = coin.SoSeparator()
-        sep.setName(_PREVIEW_NODE_NAME)
 
         # White outline of the actual fill region (after holes + margin).
         try:
@@ -655,24 +649,10 @@ class HexFillTaskPanel:
         if sep.getNumChildren() == 0:
             return
         view = Gui.ActiveDocument.ActiveView
-        sg = view.getSceneGraph()
-        sg.addChild(sep)
-        self._preview_node = sep
-        self._preview_sg = sg
+        _show_preview(sep, view.getSceneGraph())
 
     def _clear_preview(self, *args):
-        # Remove from the exact scene graph we added to (robust even if the
-        # active view changed), then also sweep by name as a backup.
-        node = self._preview_node
-        sg = self._preview_sg
-        if node is not None and sg is not None:
-            try:
-                sg.removeChild(node)
-            except Exception:
-                pass
-        self._preview_node = None
-        self._preview_sg = None
-        _remove_stale_previews()
+        _hide_preview()
 
     def getStandardButtons(self):
         buttons = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -849,7 +829,7 @@ class CmdHexFillCreate:
     def Activated(self):
         from freecad.hexfill.HexFillCore import get_boundary_face, get_source_placement, get_host_shape
 
-        _remove_stale_previews()  # clear any preview orphaned by a previous run
+        _hide_preview()  # clear any preview left from a previous run
         sel = Gui.Selection.getSelection()
         source = sel[0] if sel else None
         if not self._usable(source):

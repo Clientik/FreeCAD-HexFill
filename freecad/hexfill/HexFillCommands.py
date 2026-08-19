@@ -661,6 +661,15 @@ class HexFillTaskPanel:
         self._preview_sg = sg
 
     def _clear_preview(self, *args):
+        # Remove from the exact scene graph we added to (robust even if the
+        # active view changed), then also sweep by name as a backup.
+        node = self._preview_node
+        sg = self._preview_sg
+        if node is not None and sg is not None:
+            try:
+                sg.removeChild(node)
+            except Exception:
+                pass
         self._preview_node = None
         self._preview_sg = None
         _remove_stale_previews()
